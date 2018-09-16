@@ -82,12 +82,21 @@ brand_discuss_df$tool_name %in%
 
 top10_brand<-top10_df [order(-top10_df$discuss_sum ),] %>% .$tool_name %>% .[1:10] 
 
-#品牌價錢分布
+#各品牌價錢分布(all)
+
+top10_brand<-gsub("\\Stilletto",replacement="Stiletto",top10_brand) #字串取代
+
 filter(hammer_detail,tool_name %in%  top10_brand ,!is.na(tool_price)) %>% 
   ggplot(data=.,aes(x=tool_name,y=tool_price_nosign,fill=tool_name))+
-  geom_boxplot()
+  geom_boxplot()+ scale_y_continuous(breaks=c(10,30,60,90,120,150,180,210))
 
 filter(hammer_detail,tool_name== 'MAXCRAFT' ) %>% View
+
+#各品牌價錢分布(-Stilletto)
+top10_brand=top10_brand[-c(9,10)]
+filter(hammer_detail,tool_name %in%  top10_brand ,!is.na(tool_price)) %>% 
+  ggplot(data=.,aes(x=tool_name,y=tool_price_nosign,fill=tool_name))+geom_boxplot()+
+  scale_y_continuous(breaks=c(10,20,30,40,50,60,70,80,90,100))
 
 #材質
 hammer_detail$material %>% summary %>% sort %>% View
@@ -95,6 +104,7 @@ hammer_material=hammer_detail$material %>% summary %>% sort  %>%as.data.frame()
 hammer_material$material=row.names(hammer_material)
 hammer_material$material[1:25]='other'
 hammer_material=hammer_material[-50,]
+hammer_material=hammer_material[-c(1:25),]
 ggplot(data=hammer_material,aes(x=material,y=.,fill=material))+
   geom_bar(stat="identity")
 
@@ -122,12 +132,12 @@ hammer_detail$size_ounce=str_extract(hammer_detail$size_ounce,"[0-9]+") %>% as.i
 
 
 
-hammer_size=hammer_detail$size_ounce %>% summary %>% sort  %>% as.data.frame()
+
 hammer_size=hammer_detail[,c("size_ounce","tool_name")]  %>% na.omit()
 hammer_size=hammer_size [order(hammer_size$size_ounce),] 
 hammer_size2=hammer_size %>% group_by(size_ounce) %>% summarize(count=n(),brand=n_distinct(tool_name)) %>% filter(count>=10) 
 
-ggplot(data=hammer_size2,aes(x=size_ounce,y=brand)) + geom_line()+geom_point() +ggtitle("競爭狀況分析")+xlab('產品(OZ)')+ylab('品牌數量')
+ggplot(data=hammer_size2,aes(x=size_ounce,y=brand))  + scale_x_continuous(breaks=1:40)+ scale_y_continuous(breaks=c(10,20,30,40,50,60,70,80,90,100)) + geom_line()+geom_point() +ggtitle("競爭狀況分析")+xlab('產品(OZ)')+ylab('品牌數量')
 
 ##################rank################
 

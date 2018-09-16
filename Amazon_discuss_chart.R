@@ -1,6 +1,6 @@
 ############Read file##############
 getwd()
-setwd("D:/Lab/Rcode")
+setwd("D:/Lab/Rcode/Hammer")
 library(data.table)
 library(dplyr)
 Amazon=fread('./data/Amazon_reviews.csv',stringsAsFactors=FALSE)
@@ -129,6 +129,7 @@ library(randomForest)
 library(wordcloud)
 
 ##建立文集
+Amazon$artContent<-toupper(str_trim(Amazon$artContent)) #把評論都先變大寫(不然轉小寫都會出問題)
 corpus = Corpus(VectorSource(Amazon$artContent)) 
 corpus[[1]]$content[1:10]
 
@@ -182,13 +183,14 @@ wordcloud(words = text$word, freq = text$., min.freq = 200,
 
 
 ##讀取字典
-appearance=read.table('./詞庫/appearance.txt')
-handle=read.table('./詞庫/use.txt')
-convenient=read.table('./詞庫/convenient.txt')
+design=read.table('./詞庫/design.txt')
+use=read.table('./詞庫/use.txt')
+#use1=read.table('./詞庫/use1.txt')
+service=read.table('./詞庫/service.txt')
 quality=read.table('./詞庫/quality.txt')
 price=read.table('./詞庫/price.txt')
 
-dic_list=list(appearance,handle,convenient,quality,price)
+dic_list=list(design,use,service,quality,price)
 
 
 
@@ -204,6 +206,6 @@ for(i in 1:5){
   qq=rbind(qq,data.frame(V1=V1,V2=V2))
 }
 
-ggplot(qq, aes(x=V1,y=V2))+geom_bar(stat="identity")+xlab("話題討論")+ylab("次數") 
+ggplot(qq, aes(x=V1,y=V2))+geom_bar(stat="identity")+xlab("話題討論")+ylab("次數") +scale_y_continuous(breaks =c(0:15)) 
 
 text$word  %in% dic_list[[1]]$V1 
